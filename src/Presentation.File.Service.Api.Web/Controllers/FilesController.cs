@@ -47,7 +47,7 @@ namespace Presentation.File.Service.Api.Web.Controllers
         /// <remarks>
         /// Sample request:
         ///     POST /api/files/
-        ///         content-type:mulipart/from-data
+        ///         content-type:multipart/form-data
         ///         name="file"
         /// </remarks>
         /// <param name="model"></param>

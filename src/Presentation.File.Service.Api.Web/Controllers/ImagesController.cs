@@ -74,7 +74,7 @@ namespace Presentation.File.Service.Api.Web.Controllers
         /// <remarks>
         /// Sample request:
         ///     POST /api/images/
-        ///         content-type:mulipart/from-data
+        ///         content-type:multipart/form-data
         ///         content-type:image/jpg、image/jpeg、image/png
         ///         name="file"
         /// </remarks>
