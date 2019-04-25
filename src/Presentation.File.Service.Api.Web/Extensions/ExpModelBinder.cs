@@ -20,14 +20,14 @@ namespace Presentation.File.Service.Api.Web.Extensions
 
             bindingContext.ModelState.SetModelValue(modelName, valueProviderResult);
             var value = valueProviderResult.FirstValue;
-            if (string.IsNullOrEmpty(value) || !value.StartsWith("$action=", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(value))
             {
                 return Task.CompletedTask;
             }
 
             var model = new Exp
             {
-                Action = value.Replace("$action=", "")
+                Action = value
             };
             bindingContext.Result = ModelBindingResult.Success(model);
             return Task.CompletedTask;

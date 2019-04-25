@@ -28,41 +28,20 @@ namespace Presentation.File.Service.Api.Web.Controllers
         /// </summary>
         /// <remarks>
         /// Sample request:
-        ///     GET /api/images/123
-        /// </remarks>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}")]
-        [ProducesResponseType((int) HttpStatusCode.OK)]
-        [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Get(long id)
-        {
-            var file = await FileService.GetAsync(id);
-            if (file == null)
-                return NotFound();
-            file.Stream.Seek(0, SeekOrigin.Begin);
-            return File(file.Stream, file.ContentType);
-        }
-
-        /// <summary>
-        /// 获取图片文件
-        /// </summary>
-        /// <remarks>
-        /// Sample request:
-        ///     GET /api/images/123/$action=@resize_1000,_1000@crop_100,_100,_500,_500@rotate_90
+        ///     GET /api/images/123/?$action=@resize_1000,_1000@crop_100,_100,_500,_500@rotate_90
         /// </remarks>
         /// <param name="id"></param>
         /// <param name="exp"></param>
         /// <returns></returns>
-        [HttpGet("{id}/{exp}")]
+        [HttpGet("{id}")]
         [ProducesResponseType((int) HttpStatusCode.OK)]
         [ProducesResponseType((int) HttpStatusCode.NotFound)]
-        public async Task<IActionResult> Get(long id, Exp exp)
+        public async Task<IActionResult> Get(long id, [FromQuery(Name = "$action")] Exp exp)
         {
             var file = await FileService.GetAsync(id);
             if (file == null)
                 return NotFound();
-            var stream = ImageFileProcessor.Process(file.Stream, file.ContentType, exp.ToExp());
+            var stream = exp == null ? file.Stream : ImageFileProcessor.Process(file.Stream, file.ContentType, exp.ToExp());
             file.Stream.Dispose();
             stream.Seek(0, SeekOrigin.Begin);
             return File(stream, file.ContentType);
