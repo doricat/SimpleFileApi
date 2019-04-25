@@ -41,8 +41,17 @@ namespace Presentation.File.Service.Api.Web.Controllers
             var file = await FileService.GetAsync(id);
             if (file == null)
                 return NotFound();
-            var stream = exp == null ? file.Stream : ImageFileProcessor.Process(file.Stream, file.ContentType, exp.ToExp());
-            file.Stream.Dispose();
+            Stream stream;
+            if (exp == null)
+            {
+                stream = file.Stream;
+            }
+            else
+            {
+                stream = ImageFileProcessor.Process(file.Stream, file.ContentType, exp.ToExp());
+                file.Stream.Dispose();
+            }
+
             stream.Seek(0, SeekOrigin.Begin);
             return File(stream, file.ContentType);
         }
