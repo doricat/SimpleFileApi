@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using Application.File;
 using Domain.File;
+using Domain.Seedwork;
 using Infrastructure.Data.File.PgSQL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,10 +24,10 @@ namespace Presentation.File.Service.Api.Web.Extensions
         {
             services.AddSingleton(new PostgresOptions
             {
-                IdSequenceDatabaseConnectionString = configuration.GetConnectionString("EntityIdSequenceDatabase"),
-                BizDatabaseConnectionString = configuration.GetConnectionString("FileMetadataDatabase"),
-                IdSequenceName = configuration.GetValue<string>("IdSequenceName")
+                BizDatabaseConnectionString = configuration.GetConnectionString("FileMetadataDatabase")
             });
+
+            services.AddOptions<LocalIdentityGeneratorOptions>().Configure(o => { o.MachineTag = 1; });
 
             return services;
         }

@@ -15,9 +15,18 @@ namespace Application.File
 
         public Task<string> SelectDirectoryAsync()
         {
-            if (!Directory.Exists(Options.RootDirectory))
-                Directory.CreateDirectory(Options.RootDirectory);
-            return Task.FromResult(Options.RootDirectory);
+            var path = Options.RootDirectory;
+
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new InvalidOperationException();
+            }
+
+            var dir = path.StartsWith(".") ? Path.GetFullPath(path) : path;
+
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
+            return Task.FromResult(dir);
         }
     }
 }

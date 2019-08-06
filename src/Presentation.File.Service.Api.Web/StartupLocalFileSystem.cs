@@ -1,5 +1,4 @@
 ﻿using Domain.Seedwork;
-using Infrastructure.Data.File.PgSQL;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -33,7 +32,7 @@ namespace Presentation.File.Service.Api.Web
                 .AddPostgresConfiguration(Configuration)
                 .AddApplicationLayerServices(Configuration)
                 .AddRepositories(Configuration)
-                .AddSingleton<IIdentityGenerator<long>, PostgresIdentityGenerator>();
+                .AddSingleton<IIdentityGenerator<long>, DefaultIdentityGenerator>();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

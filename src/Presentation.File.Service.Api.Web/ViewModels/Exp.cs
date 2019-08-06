@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.File.Service.Api.Web.Extensions;
 
@@ -10,25 +10,60 @@ namespace Presentation.File.Service.Api.Web.ViewModels
     [ModelBinder(typeof(ExpModelBinder))]
     public class Exp : IValidatableObject
     {
-        private string[] _operators;
+        private static readonly IList<string> Methods = new List<string> {"resize", "crop", "rotate"};
+
+        public Exp(string action)
+        {
+            Action = action;
+
+            if (!string.IsNullOrWhiteSpace(action))
+            {
+                var (tokens, symbols) = Scanner.Scan(action, Methods);
+                Tokens = tokens;
+                Symbols = symbols;
+                var errors = Analyzer.Analyze(tokens, symbols);
+                if (errors.Any())
+                {
+                    Errors.AddRange(errors);
+                }
+            }
+        }
 
         /// <summary>
-        /// eg:@resize_w,_h@crop_x,_y,_w,_h@rotate_90
+        /// eg:resize(w,h).crop(x,y,w,h).rotate(90)
         /// </summary>
-        public string Action { get; set; }
+        public string Action { get; }
+
+        public IList<Token> Tokens { get; }
+
+        public IDictionary<Token, Symbol> Symbols { get; }
+
+        public List<string> Errors { get; } = new List<string>();
 
         public IList<string> ToExp()
         {
             var result = new List<string>();
-            foreach (var s in _operators)
+            var temp = new List<string>();
+            string method = null;
+            foreach (var token in Tokens)
             {
-                var array = s.Split('_');
-                if (array.Any())
+                if (token.Type == TokenType.Method || token.Type == TokenType.ExprEnd)
                 {
-                    for (var i = array.Length - 1; i >= 0; i--)
+                    if (temp.Any() && method != null)
                     {
-                        result.Add(array[i].Replace(",", ""));
+                        temp.Reverse();
+                        result.AddRange(temp);
+                        result.Add(method);
+                        temp.Clear();
                     }
+
+                    method = token.Value;
+                    continue;
+                }
+
+                if (token.Type == TokenType.Literal)
+                {
+                    temp.Add(token.Value);
                 }
             }
 
@@ -38,14 +73,9 @@ namespace Presentation.File.Service.Api.Web.ViewModels
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             var result = new List<ValidationResult>();
-            _operators = Action.Substring(1).Split('@');
-            foreach (var s in _operators)
+            if (Errors.Any())
             {
-                if (!Regex.IsMatch(s, @"^(@?resize_([1-9]|\d{2,3}|40[0-9][0-6]),_([1-9]|\d{2,3}|40[0-9][0-6]))|(@?crop_([1-9]|\d{2,3}|40[0-9][0-6]),_([1-9]|\d{2,3}|40[0-9][0-6]),_([1-9]|\d{2,3}|40[0-9][0-6]),_([1-9]|\d{2,3}|40[0-9][0-6]))|(@?rotate_(0|90|180|270))$"))
-                {
-                    result.Add(new ValidationResult("操作符不满足约束。", new[] {nameof(Action)}));
-                    break;
-                }
+                result.AddRange(Errors.Select(x => new ValidationResult(x)));
             }
 
             return result;

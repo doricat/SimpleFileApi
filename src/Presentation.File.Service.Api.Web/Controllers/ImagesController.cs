@@ -28,7 +28,7 @@ namespace Presentation.File.Service.Api.Web.Controllers
         /// </summary>
         /// <remarks>
         /// Sample request:
-        ///     GET /api/images/123/?$action=@resize_1000,_1000@crop_100,_100,_500,_500@rotate_90
+        ///     GET /api/images/123/?$action=resize(1000,1000).crop(100,100,500,500).rotate(90)
         /// </remarks>
         /// <param name="id"></param>
         /// <param name="exp"></param>
@@ -93,16 +93,7 @@ namespace Presentation.File.Service.Api.Web.Controllers
         /// Sample request:
         ///     PATCH /api/images/123
         ///         {
-        ///             "Crop": {
-        ///                 "X": 100,
-        ///                 "Y": 100,
-        ///                 "Width": 500,
-        ///                 "Height": 500
-        ///             },
-        ///             "Resize": {
-        ///                 "Width": 1000,
-        ///                 "Height": 1000
-        ///             }
+        ///             "Action": "resize(1000,1000).crop(100,100,500,500).rotate(90)"
         ///         }
         /// </remarks>
         /// <param name="id"></param>

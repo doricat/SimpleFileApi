@@ -16,7 +16,7 @@ namespace Application.File
         public async Task<string> SaveAsync(Stream stream)
         {
             var directory = await DirectorySelector.SelectDirectoryAsync();
-            var fileName = Path.Combine(directory, Path.GetRandomFileName());
+            var fileName = Path.Combine(directory, Path.GetRandomFileName()).Replace("\\", "/");
             using (var file = System.IO.File.Create(fileName))
             {
                 stream.Seek(0, SeekOrigin.Begin);

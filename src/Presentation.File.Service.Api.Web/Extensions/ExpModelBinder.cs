@@ -25,10 +25,7 @@ namespace Presentation.File.Service.Api.Web.Extensions
                 return Task.CompletedTask;
             }
 
-            var model = new Exp
-            {
-                Action = value
-            };
+            var model = new Exp(value.ToLower());
             bindingContext.Result = ModelBindingResult.Success(model);
             return Task.CompletedTask;
         }

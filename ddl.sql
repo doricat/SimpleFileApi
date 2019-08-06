@@ -1,5 +1,3 @@
-create sequence id_seq;
-
 create table if not exists file_metadata
 (
   id           bigint                              not null

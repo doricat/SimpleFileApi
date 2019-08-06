@@ -1,27 +1,36 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Presentation.File.Service.Api.Web.ViewModels
 {
-    public class ImagePatchInputModel
+    public class ImagePatchInputModel : IValidatableObject
     {
-        /// <summary>
-        /// 剪裁参数，优先级1
-        /// </summary>
-        public CropInputModel Crop { get; set; }
+        private Exp _exp;
 
-        /// <summary>
-        /// 缩放参数，优先级0
-        /// </summary>
-        public ResizeInputModel Resize { get; set; }
+        public string Action { get; set; }
 
         public IList<string> ToExp()
         {
-            var result = new List<string>();
-            if (Resize != null)
-                result.AddRange(Resize.ToExp());
+            return _exp.ToExp();
+        }
 
-            if (Crop != null)
-                result.AddRange(Crop.ToExp());
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            var result = new List<ValidationResult>();
+            if (string.IsNullOrWhiteSpace(Action))
+            {
+                result.Add(new ValidationResult("action不能为空", new[] {"action"}));
+            }
+            else
+            {
+                _exp = new Exp(Action);
+                var errors = _exp.Validate(validationContext).ToList();
+                if (errors.Any())
+                {
+                    result.AddRange(errors);
+                }
+            }
 
             return result;
         }
